@@ -1,0 +1,15 @@
+{
+  "name": "mapreduce",
+  "version": "1.0.0",
+  "description": "",
+  "main": "mapreduce.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node mapreduce.js"
+  },
+  "author": "Gkonst",
+  "license": "ISC",
+  "bin": {
+    "mapreduce": "./mapreduce.js"
+  }
+}
