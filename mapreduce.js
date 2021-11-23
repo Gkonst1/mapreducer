@@ -17,5 +17,5 @@ if (!myArgs[0] || (myArgs[0] !== '--server' && myArgs[0] !== '--client')) {
 		var child = spawn.fork('./client.js', [myArgs[1], myArgs[2],myArgs[3]]);
 	} else {
 		process.exit();
-	}
-}
+	};
+};

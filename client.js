@@ -34,10 +34,11 @@ const makeRequest = (data) => {
 			}
 		}
 
+		// The HTTP request
 		const req = http.request(options, res => {
 		  	res.on('data', d => {
 		    	sums_array = JSON.parse(d.toString())
-		  	})
+		  	});
 
 		  	res.on('end', () => {
 
@@ -48,30 +49,30 @@ const makeRequest = (data) => {
 
 				total_sum = 0;
 				for (i=0; i < sums_array.length; i++) {
-					line_sum = sums_array[i][i+1]
-					console.log(`Array ${i+1}: `, line_sum)
+					line_sum = sums_array[i][i+1];
+					console.log(`Array ${i+1}: `, line_sum);
 					total_sum += line_sum;
-				}	
+				};	
 
-				console.log('Total: ', total_sum)
+				console.log('Total: ', total_sum);
 
 				process.exit();
-		  	})
-		})
+		  	});
+		});
 
 		req.on('error', error => {
 		  	if (error.code == 'ECONNREFUSED') {
-		  		console.log('Please use the same port number for client and server.')
-		  		console.log('Syntax: mapreduce --client <filename> -port <port_number>')
+		  		console.log('Please use the same port number for client and server.');
+		  		console.log('Syntax: mapreduce --client <filename> -port <port_number>');
 		  	} else {
-		  		console.log(error.message)
+		  		console.log(error.message);
 		  	}
-		  	process.exit()
-		})
+		  	process.exit();
+		});
 
-		req.write(data)
-		req.end()
-}
+		req.write(data);
+		req.end();
+};
 
 
 /**
@@ -88,12 +89,13 @@ const checkForPort = () => {
 		{
 			process.env.PORT = myArgs[myArgs.indexOf('-port') + 1];
 		} else {
-			console.log('Please provide a valid port number (integer between 1-65535).')
+			console.log('Please provide a valid port number (integer between 1-65535).');
 			process.exit();
-		}
+		};
 	};
-}
+};
 
+// Checks if the user provided a file for the program to read
 if (!myArgs[0]) {
 	console.log("Please specify the text file.");
 	console.log("Syntax: mapreduce --client <filename>.txt");
@@ -101,31 +103,40 @@ if (!myArgs[0]) {
 } else {
 	filename = myArgs[0];
 
+	/**
+	 * Creates the line array with the numbers from the file
+	 * @return {promise} Returns a promise when the array is ready for use.
+	 */
 	function createLinesArray() {
 		return new Promise(resolve => {
 		    fs.access(filename, fs.F_OK, (err) => {
-			  	if (err) {
+		    	// Check if the provided file exists and it's a .txt file
+			  	if (err || !filename.match(/(.txt)/)) {
 			    	console.log("Please specify a valid text file.");
 					console.log("Syntax: ./client.js <filename>.txt");
-			    	return
+			    	process.exit();
 				}
 
 				var lineReader = require('readline').createInterface({
 					input: fs.createReadStream(filename)
 				});
 
+				// Read file lines
 				lineReader.on('line', function (line) {
 					lines_array.push(line.split(/[\s,]/g));
 
 					for (i=0; i<lines_array.length; i++) {
 						lines_array[i] = lines_array[i].map(item => parseInt(item)).filter(item => !Number.isNaN(item))
 						resolve();
-					}
+					};
 				});
-			})
+			});
 		});
-	}	
+	};
 
+	/**
+	 * Prepares and encrypts the data for the API request
+	 */
 	async function sendData() {
 		const result = await createLinesArray();
 		const data   = JSON.stringify({
@@ -134,10 +145,10 @@ if (!myArgs[0]) {
 
 		const cipher    = crypto.createCipheriv(algorithm, secret_key, iv);
 		const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
-		final_data      = encrypted.toString('hex')
+		final_data      = encrypted.toString('hex');
 
 		checkForPort();
 		makeRequest(JSON.stringify(final_data));
-	}
+	};
 	sendData();
-}
+};
