@@ -62,6 +62,7 @@ const makeRequest = (data) => {
 		req.on('error', error => {
 		  	if (error.code == 'ECONNREFUSED') {
 		  		console.log('Please use the same port number for client and server.')
+		  		console.log('Syntax: mapreduce --client <filename> -port <port_number>')
 		  	} else {
 		  		console.log(error.message)
 		  	}
@@ -95,7 +96,7 @@ const checkForPort = () => {
 
 if (!myArgs[0]) {
 	console.log("Please specify the text file.");
-	console.log("Syntax: ./client.js <filename>.txt");
+	console.log("Syntax: mapreduce --client <filename>.txt");
 	process.exit();
 } else {
 	filename = myArgs[0];
