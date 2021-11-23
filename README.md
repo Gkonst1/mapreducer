@@ -14,7 +14,8 @@
 
 ## Installation
 ------------------------
-	> Open a terminal in project's root directory and run the command `npm link` as an administrator. If this command produce an error try `npm install`, before trying again.
+	> Open a terminal in project's root directory and run the command `npm link` as an administrator.
+	> If this command produce an error try `npm install`, before trying again.
 
 ----------------------------------------------------------------------------------------------------
 
