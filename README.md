@@ -6,22 +6,37 @@
 
 ----------------------------------------------------------------------------------------------------
 
+## Prerequisites
+------------------------
+	- NodeJS, you can install it from [here](https://nodejs.org/en/).
+
+----------------------------------------------------------------------------------------------------
+
 ## Installation
 ------------------------
-	> Open a terminal in project's root directory and run the command `sudo npm link` 
+	> Open a terminal in project's root directory and run the command `npm link` as an administrator. If this command produce an error try `npm install`, before trying again.
 
 ----------------------------------------------------------------------------------------------------
 
 ## Usage
 ------------------------
-	> Open a terminal in project's root directory.
-	- To start the tool in server mode with the default port: `mapreducer --server <processes>`
-	- To start the tool in server mode in specific port: `mapreducer --server <processes> -port <port>`
+	### For Linux:
+		> Open a terminal in project's root directory.
+		- To start the tool in server mode with the default port: `mapreducer --server <processes>`
+		- To start the tool in server mode in specific port: `mapreducer --server <processes> -port <port>`
 
-	> Then open another terminal in project's root directory.
-	- To start the tool in client mode with the default port: `mapreducer --client <file>`
-	- To start the tool in client mode in specific port: `mapreducer --client <file> -port <port>`
+		> Then open another terminal in project's root directory.
+		- To start the tool in client mode with the default port: `mapreducer --client <file>`
+		- To start the tool in client mode in specific port: `mapreducer --client <file> -port <port>`
 
+	### For Windows:
+		> Open a terminal in project's root directory.
+		- To start the tool in server mode with the default port: `node .\mapreducer --server <processes>`
+		- To start the tool in server mode in specific port: `node .\mapreducer --server <processes> -port <port>`
+
+		> Then open another terminal in project's root directory.
+		- To start the tool in client mode with the default port: `node .\mapreducer --client <file>`
+		- To start the tool in client mode in specific port: `node .\mapreducer --client <file> -port <port>`
 ----------------------------------------------------------------------------------------------------
 
 ## Arguments: 
