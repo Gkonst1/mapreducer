@@ -8,7 +8,7 @@
 
 ## Prerequisites
 ------------------------
-	- NodeJS, you can install it from [here](https://nodejs.org/en/).
+	- NodeJS, you can install it from [here](https://nodejs.org).
 
 ----------------------------------------------------------------------------------------------------
 
