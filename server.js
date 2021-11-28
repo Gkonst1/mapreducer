@@ -130,10 +130,10 @@ var server = http.createServer(async function (req, res) {
 	iv         = JSON.parse(req.headers['public-key-pins']).iv;
 
 	req.on('data', chunk => {
-		hash = JSON.parse(chunk).toString();
+		encrypted_data = JSON.parse(chunk).toString();
 
 		const decipher  = crypto.createDecipheriv(algorithm, secret_key, Buffer.from(iv, 'hex'));
-		const decrpyted = Buffer.concat([decipher.update(Buffer.from(hash, 'hex')), decipher.final()]);
+		const decrpyted = Buffer.concat([decipher.update(Buffer.from(encrypted_data, 'hex')), decipher.final()]);
 		
 		data           = JSON.parse(decrpyted.toString());
 		array_of_lines = data['data'];

@@ -2,7 +2,7 @@
 
 ## Description
 ------------------------
-> A nodejs CLI tool, which accepts a file with numbers on each line and returns the sum of each line as well as the total sum of the numbers.
+> A nodejs CLI tool, which accepts a text file with numbers on each line and returns the sum of each line as well as the total sum of the numbers.
 
 ### Functionality description
 > Firstly we need to start the mapreduce program in server mode and specify a number of processes that it will start. Then in another terminal we start the mapreduce program in client mode and we specify a text file to read its lines. Then the client sends to the server an array, which has arrays with the numbers of each line. The server accepts the array and splits it into smaller chunks with the size of the count of the created processes. Then sends those chunks one by one at the child processes and they calculate the sum of each line and return it to the server. Then the server sends back the sums with a total sum of all the lines' numbers and the client print them in the console.
@@ -48,4 +48,7 @@
 - processes: The number of the child processes that the mapreduce tool will create.
 - port     : The port number the server will listen. [OPTIONAL]
 - file     : The text file with the numbers.
+
+
+Created by © Gkonst
  
