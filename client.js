@@ -47,7 +47,8 @@ const makeRequest = (data) => {
 				    return (Object.keys(a)[0] - Object.keys(b)[0]);
 				});
 
-				total_sum = 0;
+				let total_sum = 0;
+
 				for (i=0; i < sums_array.length; i++) {
 					line_sum = sums_array[i][i+1];
 					console.log(`Array ${i+1}: `, line_sum);
@@ -101,7 +102,7 @@ if (!myArgs[0]) {
 	console.log("Syntax: mapreduce --client <filename>.txt");
 	process.exit();
 } else {
-	filename = myArgs[0];
+	const filename = myArgs[0];
 
 	/**
 	 * Creates the line array with the numbers from the file
@@ -117,19 +118,26 @@ if (!myArgs[0]) {
 			    	process.exit();
 				}
 
-				var lineReader = require('readline').createInterface({
-					input: fs.createReadStream(filename)
-				});
+				async function processLineByLine() {
+				  	const fileStream = fs.createReadStream(filename);
 
-				// Read file lines
-				lineReader.on('line', function (line) {
-					lines_array.push(line.split(/[\s,]/g));
+				  	const lineReader = require('readline').createInterface({
+				    	input: fileStream,
+				    	crlfDelay: Infinity
+				  	});
+				  	// Note: we use the crlfDelay option to recognize all instances of CR LF
+				  	// ('\r\n') in test.txt as a single line break.
 
-					for (i=0; i<lines_array.length; i++) {
-						lines_array[i] = lines_array[i].map(item => parseInt(item)).filter(item => !Number.isNaN(item))
-						resolve();
+				  	for await (const line of lineReader) {
+						lines_array.push(line.split(/[\s,]/g));
+
+						for (i=0; i<lines_array.length; i++) {
+							lines_array[i] = lines_array[i].map(item => parseInt(item)).filter(item => !Number.isNaN(item))
+						};
 					};
-				});
+					resolve();
+				};
+				processLineByLine();
 			});
 		});
 	};

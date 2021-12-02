@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 
 const spawn  = require('child_process');
+var events   = require('events');
 const http   = require('http');
 const crypto = require('crypto');
 
 const myArgs = process.argv.slice(2);
 
-num_of_processes = null;
-const algorithm  = 'aes-256-ctr';
-array_of_lines   = [];
-splitted_array   = [];
-proc_array       = [];
-sum_array        = [];
+const emitter        = new events.EventEmitter();
+let num_of_processes = null;
+const algorithm  	 = 'aes-256-ctr';
+let array_of_lines   = [];
+let splitted_array   = [];
+let proc_array       = [];
+let sum_array        = [];
 
 
 /**************** Function Declarations ****************/
@@ -21,12 +23,13 @@ sum_array        = [];
  * calculate the sum
  */
 const sendData = () => {
-	count = 0;
+	let count = 0;
+
 	for (i=0; i < splitted_array.length; i++) {
 		for (j=0; j < proc_array.length; j++) {
 			if (splitted_array[i][j]){
 				count++;
-				object_to_send        = {};
+				let object_to_send    = {};
 				object_to_send[count] = splitted_array[i][j];
 				proc_array[j].send(object_to_send);
 			};
@@ -41,6 +44,14 @@ const sendData = () => {
 const createProc = () => {
 	const child = spawn.fork('./child.js');
 	proc_array.push(child);
+
+	child.on('message', function(m) {
+	  	sum_array.push(m);
+
+	  	if (sum_array.length == array_of_lines.length) {
+	  		emitter.emit('sendDataBack');
+	  	};
+  	});
 };
 
 
@@ -52,8 +63,8 @@ const createProc = () => {
  * 				   from the client
  */
 const split_array = (array) => {
-	temp_array = [];
-	count      = 0;
+	let temp_array = [];
+	let count      = 0;
 
 	while (count < array.length) {
 		for (i=0; i < num_of_processes; i++) {
@@ -63,7 +74,7 @@ const split_array = (array) => {
 			}
 		}
 		splitted_array.push(temp_array);
-		temp_array = [];
+		temp_array  = [];
 	};
 };
 
@@ -72,10 +83,23 @@ const split_array = (array) => {
  * Creates all the necessary child processes
  */
 const spawnProcesses = () => {
-	for (i=0; i < parseInt(num_of_processes); i++) {
+	for (i=0; i < num_of_processes; i++) {
 		createProc();
 	};
 };
+
+
+/**
+ * Kills the created processes just before the program exits
+ */
+const killProcesses = () => {
+	emitter.removeAllListeners('sendDataBack')
+
+	for (i=0; i < proc_array.length; i++) {
+		proc_array[i].removeAllListeners('message');
+  		proc_array[i].kill('SIGINT');
+	};
+}
 
 
 /**
@@ -85,7 +109,7 @@ const spawnProcesses = () => {
  */
 const validateProcessesInput = () => {
 	if (myArgs[0] && Number.isInteger(parseInt(myArgs[0])) && parseInt(myArgs[0]) > 0) {
-		num_of_processes = myArgs[0];
+		num_of_processes = parseInt(myArgs[0]);
 	} else {
 		console.log('Please provide the number of the child processes');
 		console.log('WARNING: The number for the child processes must be a positive integer.');
@@ -121,6 +145,7 @@ const validatePortInput = () => {
 
 validateProcessesInput();
 validatePortInput();
+spawnProcesses();
 
 const PORT = process.env.PORT || 5000;
 
@@ -139,25 +164,10 @@ var server = http.createServer(async function (req, res) {
 		array_of_lines = data['data'];
 		splitted_array = [];
 		sum_array      = [];
-		proc_array     = [];
 
-	    if (!proc_array.length) {
-		    spawnProcesses();
-	    };
-
-	    for (i=0; i<proc_array.length; i++) {
-	    	proc_array[i].on('message', function(m) {
-			  	sum_array.push(m);
-
-			  	if (sum_array.length == array_of_lines.length) {
-			  		res.end(JSON.stringify(sum_array));
-
-			  		for (i=0; i < proc_array.length; i++) {
-					  	proc_array[i].kill('SIGINT');
-			  		};
-			  	};
-		  	});
-	    };
+		emitter.on('sendDataBack', function() {
+			res.end(JSON.stringify(sum_array));
+		});
 
 	    split_array(array_of_lines);
 	    sendData();
@@ -177,3 +187,5 @@ server.once('error', function(err) {
     console.log("Port is currently in use");
   };
 });
+
+process.on('exit', killProcesses.bind());
