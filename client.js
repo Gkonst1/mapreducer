@@ -146,7 +146,7 @@ if (!myArgs[0]) {
 	 * Prepares and encrypts the data for the API request
 	 */
 	async function sendData() {
-		const result = await createLinesArray();
+		await createLinesArray();
 		const data   = JSON.stringify({
 	  		data: lines_array
 		})
